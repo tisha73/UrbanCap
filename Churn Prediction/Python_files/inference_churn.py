@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from datetime import datetime
 
-# Load environment variables
+# Loading environment variables
 load_dotenv()
 mongodb_uri = os.getenv("MONGODB_URI")
 
@@ -17,7 +17,7 @@ db = client["UrbanCap"]
 # Load saved pipeline
 clf_pipeline = joblib.load("churn_stacking_model.pkl")
 
-# ---------- Feature Engineering Functions ----------
+#  Feature Engineering 
 
 def calculate_spend_change_rate(df):
     n = len(df)
@@ -53,7 +53,7 @@ def downgrade_by_service_id(df):
     recent_avg_id = df.iloc[len(df) // 2:]["Service_ID"].mean()
     return int(recent_avg_id < early_avg_id)
 
-# ---------- Inference Function ----------
+#  Inference Function
 
 def run_churn_prediction():
     churn_df = pd.DataFrame(list(db["churn"].find()))
@@ -105,7 +105,7 @@ def run_churn_prediction():
         .merge(freq_change, on='user_id', how='left') \
         .merge(combined_downgrade[['user_id', 'Downgrade_Service_Usage']], on='user_id', how='left')
 
-    # Merge additional features
+    # Merging additional features
     additional_features = [
         'preferred_time_slots','booking_history_count','cancellation_rate','App_Logins_Per_Month',
         'Time_Spent_on_Platform (min)','Browsing_History_Depth','Search_Queries_Performed','Social_Media_Engagement',
@@ -131,7 +131,7 @@ def run_churn_prediction():
     results['Churn_Probability'] = probs
     results['Churn_Prediction'] = preds
 
-    print("\n🔍 Inference Complete:")
+    print("\n Inference Complete:")
     print(results.head(10))
     return results
 
